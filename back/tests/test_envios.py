@@ -11,47 +11,13 @@ Ejecutar desde la carpeta back/:
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
 
-from app import models
-from app.database import get_db
 from main import app
 
-# ── Base de datos de prueba en memoria ────────────────────────────────────────
-# StaticPool garantiza que todas las conexiones usen la misma BD en memoria.
-TEST_DB_URL = "sqlite:///:memory:"
-
-test_engine = create_engine(
-    TEST_DB_URL,
-    connect_args={"check_same_thread": False},
-    poolclass=StaticPool,
-)
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
-
-
-def override_get_db():
-    db = TestingSessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-app.dependency_overrides[get_db] = override_get_db
 client = TestClient(app)
 
 
 # ── Fixtures ──────────────────────────────────────────────────────────────────
-@pytest.fixture(autouse=True, scope="module")
-def setup_database():
-    """Crea las tablas antes del módulo y las elimina al finalizar."""
-    models.Base.metadata.create_all(bind=test_engine)
-    yield
-    models.Base.metadata.drop_all(bind=test_engine)
-
-
 @pytest.fixture(scope="module")
 def auth_token() -> str:
     """Registra un usuario de prueba y retorna su JWT para los tests protegidos."""

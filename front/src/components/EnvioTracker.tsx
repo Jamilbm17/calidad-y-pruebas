@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useGetEnvio } from "../core/hooks/useQueryEnvio"
+import { useAddSeguimiento } from "../core/hooks/useMutationSeguimiento"
 import type { EnvioResponse } from "../core/models/envio"
 
 // ── Status display maps ───────────────────────────────────────────────────────
@@ -28,6 +29,8 @@ const STATUS_LABEL: Record<string, string> = {
   devuelto: "Devuelto",
 }
 
+const ESTADOS = ["registrado", "en_transito", "en_deposito", "entregado", "devuelto"] as const
+
 function getBadgeClass(estado: string): string {
   return STATUS_BADGE[estado] ?? "bg-gray-100 text-gray-700 border-gray-200"
 }
@@ -51,9 +54,112 @@ function formatDate(dateStr: string | null): string {
   })
 }
 
+// ── ActualizarEstadoForm ──────────────────────────────────────────────────────
+
+interface ActualizarEstadoFormProps {
+  readonly codigo: string
+  readonly onClose: () => void
+}
+
+function ActualizarEstadoForm({ codigo, onClose }: ActualizarEstadoFormProps) {
+  const [estado, setEstado] = useState("en_transito")
+  const [ubicacion, setUbicacion] = useState("")
+  const [observaciones, setObservaciones] = useState("")
+
+  const { mutate: addSeguimiento, isPending } = useAddSeguimiento(codigo, {
+    onSuccess: () => {
+      setUbicacion("")
+      setObservaciones("")
+      onClose()
+    },
+  })
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    addSeguimiento({
+      estado,
+      ubicacion_actual: ubicacion.trim() || undefined,
+      observaciones: observaciones.trim() || undefined,
+    })
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="mt-4 border border-blue-200 bg-blue-50 rounded-lg p-4 space-y-3">
+      <h4 className="text-xs font-semibold text-blue-800 uppercase tracking-wide">Actualizar Estado</h4>
+
+      <div>
+        <label htmlFor="nuevo_estado" className="block text-xs font-medium text-gray-700 mb-1">
+          Nuevo Estado
+        </label>
+        <select
+          id="nuevo_estado"
+          value={estado}
+          onChange={(e) => setEstado(e.target.value)}
+          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+        >
+          {ESTADOS.map((e) => (
+            <option key={e} value={e}>
+              {getLabel(e)}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label htmlFor="nueva_ubicacion" className="block text-xs font-medium text-gray-700 mb-1">
+          Ubicación Actual
+        </label>
+        <input
+          id="nueva_ubicacion"
+          value={ubicacion}
+          onChange={(e) => setUbicacion(e.target.value)}
+          placeholder="Ej: Almacén Trujillo Norte"
+          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      <div>
+        <label htmlFor="observaciones" className="block text-xs font-medium text-gray-700 mb-1">
+          Observaciones
+        </label>
+        <input
+          id="observaciones"
+          value={observaciones}
+          onChange={(e) => setObservaciones(e.target.value)}
+          placeholder="Ej: Paquete recibido en buen estado"
+          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      <div className="flex gap-2">
+        <button
+          type="submit"
+          disabled={isPending}
+          className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-xs font-medium py-2 rounded-lg transition-colors cursor-pointer disabled:cursor-not-allowed"
+        >
+          {isPending ? "Guardando..." : "Guardar"}
+        </button>
+        <button
+          type="button"
+          onClick={onClose}
+          className="px-4 text-xs font-medium text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg transition-colors cursor-pointer"
+        >
+          Cancelar
+        </button>
+      </div>
+    </form>
+  )
+}
+
 // ── EnvioCard ─────────────────────────────────────────────────────────────────
 
-function EnvioCard({ envio }: { envio: EnvioResponse }) {
+interface EnvioCardProps {
+  readonly envio: EnvioResponse
+  readonly isAdmin: boolean
+}
+
+function EnvioCard({ envio, isAdmin }: EnvioCardProps) {
+  const [showUpdateForm, setShowUpdateForm] = useState(false)
   const latestSeguimiento = envio.seguimientos[0]
 
   return (
@@ -106,6 +212,24 @@ function EnvioCard({ envio }: { envio: EnvioResponse }) {
         </div>
       </div>
 
+      {/* Admin: update tracking button */}
+      {isAdmin && !showUpdateForm && (
+        <button
+          type="button"
+          onClick={() => setShowUpdateForm(true)}
+          className="w-full text-xs font-medium text-blue-600 hover:text-blue-800 border border-blue-300 hover:border-blue-500 rounded-lg py-2 transition-colors cursor-pointer"
+        >
+          + Actualizar Estado del Envío
+        </button>
+      )}
+
+      {isAdmin && showUpdateForm && (
+        <ActualizarEstadoForm
+          codigo={envio.codigo_tracking}
+          onClose={() => setShowUpdateForm(false)}
+        />
+      )}
+
       {/* Timeline */}
       {envio.seguimientos.length > 0 && (
         <div>
@@ -151,7 +275,7 @@ function EnvioCard({ envio }: { envio: EnvioResponse }) {
   )
 }
 
-function Row({ label, value }: { label: string; value: React.ReactNode }) {
+function Row({ label, value }: { readonly label: string; readonly value: React.ReactNode }) {
   return (
     <div className="flex items-start justify-between gap-4">
       <span className="text-xs font-medium text-gray-500 flex-shrink-0">{label}</span>
@@ -162,9 +286,14 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
 
 // ── EnvioTracker ──────────────────────────────────────────────────────────────
 
-export default function EnvioTracker() {
+interface EnvioTrackerProps {
+  readonly userRol: string
+}
+
+export default function EnvioTracker({ userRol }: EnvioTrackerProps) {
   const [inputValue, setInputValue] = useState("")
   const [searchCode, setSearchCode] = useState("")
+  const isAdmin = userRol === "admin"
 
   const { data, isLoading, isError } = useGetEnvio(searchCode)
 
@@ -188,6 +317,7 @@ export default function EnvioTracker() {
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           placeholder="Ej: TRK-2025-001"
+          aria-label="Código de tracking"
           className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
         />
         <button
@@ -221,7 +351,7 @@ export default function EnvioTracker() {
       )}
 
       {/* Success state */}
-      {data && !isError && <EnvioCard envio={data} />}
+      {data && !isError && <EnvioCard envio={data} isAdmin={isAdmin} />}
 
       {/* Empty state */}
       {!searchCode && (

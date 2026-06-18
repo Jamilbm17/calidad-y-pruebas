@@ -41,3 +41,21 @@ def consultar_envio(
     response = schemas.EnvioResponse.model_validate(envio)
     response.seguimientos = [schemas.SeguimientoResponse.model_validate(s) for s in seguimientos]
     return response
+
+
+@router.post("/{codigo}/seguimientos", response_model=schemas.SeguimientoResponse, status_code=201)
+def agregar_seguimiento(
+    codigo: str,
+    body: schemas.CreateSeguimientoRequest,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    if current_user.get("rol") != "admin":
+        raise HTTPException(status_code=403, detail="Solo los administradores pueden actualizar el seguimiento")
+
+    envio = crud.get_envio_by_codigo(db, codigo)
+    if not envio:
+        raise HTTPException(status_code=404, detail="Envío no encontrado")
+
+    seguimiento = crud.add_seguimiento(db, envio.id_envio, body)
+    return schemas.SeguimientoResponse.model_validate(seguimiento)

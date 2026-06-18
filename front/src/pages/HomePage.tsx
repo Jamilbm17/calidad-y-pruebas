@@ -3,8 +3,8 @@ import EnvioForm from "../components/EnvioForm"
 import EnvioTracker from "../components/EnvioTracker"
 
 interface HomePageProps {
-  user: TokenResponse
-  onLogout: () => void
+  readonly user: TokenResponse
+  readonly onLogout: () => void
 }
 
 export default function HomePage({ user, onLogout }: HomePageProps) {
@@ -67,8 +67,8 @@ export default function HomePage({ user, onLogout }: HomePageProps) {
       {/* Main content */}
       <main className="max-w-5xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <EnvioForm />
-          <EnvioTracker />
+          <EnvioForm userId={user.id_usuario} />
+          <EnvioTracker userRol={user.rol} />
         </div>
       </main>
     </div>

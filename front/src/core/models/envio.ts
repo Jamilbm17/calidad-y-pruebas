@@ -21,6 +21,12 @@ export interface EnvioResponse {
   seguimientos: SeguimientoResponse[]
 }
 
+export interface CreateSeguimientoDto {
+  estado: string
+  ubicacion_actual?: string
+  observaciones?: string
+}
+
 export interface CreateEnvioDto {
   codigo_tracking: string
   id_usuario_cliente: number

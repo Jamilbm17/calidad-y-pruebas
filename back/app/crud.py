@@ -36,6 +36,19 @@ def get_envio_by_codigo(db: Session, codigo: str) -> models.Envio | None:
     )
 
 
+def add_seguimiento(db: Session, id_envio: int, data: schemas.CreateSeguimientoRequest) -> models.Seguimiento:
+    seguimiento = models.Seguimiento(
+        id_envio=id_envio,
+        estado=data.estado,
+        ubicacion_actual=data.ubicacion_actual,
+        observaciones=data.observaciones,
+    )
+    db.add(seguimiento)
+    db.commit()
+    db.refresh(seguimiento)
+    return seguimiento
+
+
 def get_seguimientos(db: Session, id_envio: int) -> list[models.Seguimiento]:
     return (
         db.query(models.Seguimiento)

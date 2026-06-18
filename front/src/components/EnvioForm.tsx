@@ -8,10 +8,6 @@ const schema = z.object({
     .string()
     .min(3, "Mínimo 3 caracteres")
     .max(100, "Máximo 100 caracteres"),
-  id_usuario_cliente: z.coerce
-    .number({ invalid_type_error: "Debe ser un número" })
-    .int()
-    .positive("Debe ser un número positivo"),
   descripcion_paquete: z.string().optional(),
   peso_kg: z.preprocess(
     (v) => (v === "" ? undefined : v),
@@ -26,7 +22,11 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>
 
-export default function EnvioForm() {
+interface EnvioFormProps {
+  readonly userId: number
+}
+
+export default function EnvioForm({ userId }: EnvioFormProps) {
   const {
     register,
     handleSubmit,
@@ -42,7 +42,7 @@ export default function EnvioForm() {
   })
 
   const onSubmit = (data: FormValues) => {
-    createEnvio(data)
+    createEnvio({ ...data, id_usuario_cliente: userId })
   }
 
   return (
@@ -55,10 +55,11 @@ export default function EnvioForm() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
         {/* Código de tracking */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="codigo_tracking" className="block text-sm font-medium text-gray-700 mb-1">
             Código de Tracking <span className="text-red-500">*</span>
           </label>
           <input
+            id="codigo_tracking"
             {...register("codigo_tracking")}
             placeholder="Ej: TRK-2025-001"
             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
@@ -68,27 +69,13 @@ export default function EnvioForm() {
           )}
         </div>
 
-        {/* ID Cliente */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            ID Usuario Cliente <span className="text-red-500">*</span>
-          </label>
-          <input
-            {...register("id_usuario_cliente")}
-            type="number"
-            min={1}
-            placeholder="Ej: 1"
-            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-          {errors.id_usuario_cliente && (
-            <p className="text-xs text-red-600 mt-1">{errors.id_usuario_cliente.message}</p>
-          )}
-        </div>
-
         {/* Descripción */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Descripción del Paquete</label>
+          <label htmlFor="descripcion_paquete" className="block text-sm font-medium text-gray-700 mb-1">
+            Descripción del Paquete
+          </label>
           <input
+            id="descripcion_paquete"
             {...register("descripcion_paquete")}
             placeholder="Ej: Laptop en caja"
             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -98,8 +85,11 @@ export default function EnvioForm() {
         {/* Peso y Dimensiones */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Peso (kg)</label>
+            <label htmlFor="peso_kg" className="block text-sm font-medium text-gray-700 mb-1">
+              Peso (kg)
+            </label>
             <input
+              id="peso_kg"
               {...register("peso_kg")}
               type="number"
               step="0.01"
@@ -110,8 +100,11 @@ export default function EnvioForm() {
             {errors.peso_kg && <p className="text-xs text-red-600 mt-1">{errors.peso_kg.message}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Dimensiones</label>
+            <label htmlFor="dimensiones" className="block text-sm font-medium text-gray-700 mb-1">
+              Dimensiones
+            </label>
             <input
+              id="dimensiones"
               {...register("dimensiones")}
               placeholder="30x20x15 cm"
               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -121,10 +114,11 @@ export default function EnvioForm() {
 
         {/* Dirección origen */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="direccion_origen" className="block text-sm font-medium text-gray-700 mb-1">
             Dirección de Origen <span className="text-red-500">*</span>
           </label>
           <input
+            id="direccion_origen"
             {...register("direccion_origen")}
             placeholder="Ej: Av. Lima 123, Lima"
             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -136,10 +130,11 @@ export default function EnvioForm() {
 
         {/* Dirección destino */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="direccion_destino" className="block text-sm font-medium text-gray-700 mb-1">
             Dirección de Destino <span className="text-red-500">*</span>
           </label>
           <input
+            id="direccion_destino"
             {...register("direccion_destino")}
             placeholder="Ej: Jr. Cusco 456, Cusco"
             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -151,8 +146,11 @@ export default function EnvioForm() {
 
         {/* Estado inicial */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Estado Inicial</label>
+          <label htmlFor="estado_inicial" className="block text-sm font-medium text-gray-700 mb-1">
+            Estado Inicial
+          </label>
           <select
+            id="estado_inicial"
             {...register("estado_inicial")}
             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
           >
@@ -166,8 +164,11 @@ export default function EnvioForm() {
 
         {/* Ubicación inicial */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Ubicación Actual</label>
+          <label htmlFor="ubicacion_inicial" className="block text-sm font-medium text-gray-700 mb-1">
+            Ubicación Actual
+          </label>
           <input
+            id="ubicacion_inicial"
             {...register("ubicacion_inicial")}
             placeholder="Ej: Centro de distribución Lima Norte"
             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
