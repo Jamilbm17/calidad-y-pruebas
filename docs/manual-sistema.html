@@ -1,0 +1,1626 @@
+<title>Manual del Sistema — OpenMed Logistics</title>
+<style>
+  /* ── Tokens ── */
+  :root {
+    --bg:        #f5f4fa;
+    --surface:   #ffffff;
+    --surface2:  #f0eef9;
+    --border:    #e2dff2;
+    --violet:    #6d28d9;
+    --violet-lt: #ede9fe;
+    --violet-dk: #5b21b6;
+    --text:      #1a1625;
+    --muted:     #6b7280;
+    --green:     #16a34a;
+    --amber:     #d97706;
+    --red:       #dc2626;
+    --blue:      #2563eb;
+    --code-bg:   #f3f0fe;
+    --code-text: #4c1d95;
+    --radius:    6px;
+    --shadow:    0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:        #111018;
+      --surface:   #1b1826;
+      --surface2:  #231f34;
+      --border:    #2d2840;
+      --violet:    #a78bfa;
+      --violet-lt: #2e1f5e;
+      --violet-dk: #c4b5fd;
+      --text:      #f0edf8;
+      --muted:     #9ca3af;
+      --green:     #4ade80;
+      --amber:     #fbbf24;
+      --red:       #f87171;
+      --blue:      #60a5fa;
+      --code-bg:   #1e1635;
+      --code-text: #c4b5fd;
+      --shadow:    0 1px 3px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="light"] {
+    --bg:#f5f4fa;--surface:#ffffff;--surface2:#f0eef9;--border:#e2dff2;
+    --violet:#6d28d9;--violet-lt:#ede9fe;--violet-dk:#5b21b6;
+    --text:#1a1625;--muted:#6b7280;--green:#16a34a;--amber:#d97706;
+    --red:#dc2626;--blue:#2563eb;--code-bg:#f3f0fe;--code-text:#4c1d95;
+    --shadow:0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.05);
+  }
+  :root[data-theme="dark"] {
+    --bg:#111018;--surface:#1b1826;--surface2:#231f34;--border:#2d2840;
+    --violet:#a78bfa;--violet-lt:#2e1f5e;--violet-dk:#c4b5fd;
+    --text:#f0edf8;--muted:#9ca3af;--green:#4ade80;--amber:#fbbf24;
+    --red:#f87171;--blue:#60a5fa;--code-bg:#1e1635;--code-text:#c4b5fd;
+    --shadow:0 1px 3px rgba(0,0,0,.4);
+  }
+
+  /* ── Reset & Base ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text);
+    background: var(--bg);
+    display: flex;
+    min-height: 100vh;
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 256px;
+    min-width: 256px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+  .sidebar-header {
+    padding: 24px 20px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .logo-mark {
+    width: 32px;
+    height: 32px;
+    background: var(--violet);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-mark svg { width: 18px; height: 18px; color: #fff; }
+  .logo-name {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 15px;
+    font-weight: bold;
+    color: var(--text);
+    letter-spacing: -.01em;
+  }
+  .logo-sub {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-top: 2px;
+  }
+  .version-chip {
+    display: inline-block;
+    font-size: 10px;
+    font-family: 'Cascadia Code', 'Fira Code', 'SF Mono', monospace;
+    background: var(--violet-lt);
+    color: var(--violet);
+    padding: 2px 8px;
+    border-radius: 99px;
+    margin-top: 8px;
+  }
+
+  .nav { padding: 12px 12px 24px; }
+  .nav-group { margin-bottom: 20px; }
+  .nav-group-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    color: var(--muted);
+    padding: 0 8px;
+    margin-bottom: 4px;
+  }
+  .nav a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: var(--radius);
+    font-size: 13.5px;
+    color: var(--muted);
+    text-decoration: none;
+    transition: background .12s, color .12s;
+  }
+  .nav a:hover { background: var(--surface2); color: var(--text); }
+  .nav a.active { background: var(--violet-lt); color: var(--violet); font-weight: 600; }
+  .nav a .nav-num {
+    font-size: 10px;
+    font-variant-numeric: tabular-nums;
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    background: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--muted);
+    font-weight: 700;
+  }
+  .nav a.active .nav-num { background: var(--violet); color: #fff; }
+
+  .theme-toggle {
+    margin-top: auto;
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+  }
+  .theme-btn {
+    width: 100%;
+    padding: 7px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface2);
+    color: var(--muted);
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background .12s, color .12s;
+  }
+  .theme-btn:hover { background: var(--violet-lt); color: var(--violet); }
+
+  /* ── Main Content ── */
+  .content {
+    flex: 1;
+    min-width: 0;
+    padding: 48px 64px 96px 56px;
+    max-width: 900px;
+  }
+
+  /* ── Cover ── */
+  .cover {
+    margin-bottom: 60px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--border);
+  }
+  .cover-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--violet);
+    margin-bottom: 12px;
+  }
+  .cover h1 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 38px;
+    font-weight: bold;
+    line-height: 1.15;
+    color: var(--text);
+    text-wrap: balance;
+    margin-bottom: 16px;
+    letter-spacing: -.02em;
+  }
+  .cover-desc {
+    font-size: 16px;
+    color: var(--muted);
+    max-width: 60ch;
+    line-height: 1.65;
+    margin-bottom: 28px;
+  }
+  .cover-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+  .meta-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--muted);
+    margin-bottom: 2px;
+  }
+  .meta-value {
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* ── Sections ── */
+  .section {
+    margin-bottom: 64px;
+    scroll-margin-top: 32px;
+  }
+  .section-eyebrow {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--violet);
+    margin-bottom: 6px;
+  }
+  .section h2 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 26px;
+    font-weight: bold;
+    color: var(--text);
+    letter-spacing: -.015em;
+    margin-bottom: 20px;
+    text-wrap: balance;
+  }
+  .section h3 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 18px;
+    color: var(--text);
+    margin-top: 32px;
+    margin-bottom: 10px;
+    letter-spacing: -.01em;
+  }
+  p { margin-bottom: 14px; color: var(--text); }
+
+  /* ── Divider ── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 48px 0;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    box-shadow: var(--shadow);
+  }
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .card-desc { font-size: 12.5px; color: var(--muted); margin: 0; }
+
+  /* ── Tech badges ── */
+  .tech-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+  }
+  .stack-layer {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .stack-header {
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .stack-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .stack-label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--text);
+  }
+  .stack-arrow {
+    font-size: 11px;
+    color: var(--muted);
+    margin-left: auto;
+  }
+  .tech-pills {
+    padding: 14px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 99px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+  }
+  .pill-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+  }
+
+  /* ── Architecture diagram ── */
+  .arch {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .arch-layer {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .arch-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .arch-info { flex: 1; }
+  .arch-name { font-size: 14px; font-weight: 700; color: var(--text); }
+  .arch-tech { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .arch-connector {
+    text-align: center;
+    padding: 8px 0;
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .arch-connector::before,
+  .arch-connector::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+    max-width: 80px;
+  }
+
+  /* ── Modules grid ── */
+  .modules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+  }
+  .module-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+  .module-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 10px;
+  }
+  .module-name { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .module-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+  /* ── Roles ── */
+  .roles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 20px;
+  }
+  .role-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    background: var(--surface);
+  }
+  .role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .role-perms { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+  .role-perms li {
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .role-perms li::before {
+    content: '';
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--violet);
+    flex-shrink: 0;
+  }
+
+  /* ── Permission matrix ── */
+  .matrix-wrap { overflow-x: auto; margin-top: 20px; }
+  .matrix {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+  .matrix th, .matrix td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .matrix thead th {
+    background: var(--surface2);
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--muted);
+  }
+  .matrix tbody tr:hover { background: var(--surface2); }
+  .matrix td:first-child { font-weight: 500; color: var(--text); }
+  .check { color: var(--green); font-size: 14px; }
+  .cross { color: var(--red); font-size: 14px; }
+  .partial { color: var(--amber); font-size: 14px; }
+
+  /* ── API reference ── */
+  .endpoint {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    background: var(--surface);
+  }
+  .endpoint-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+  .method {
+    font-size: 11px;
+    font-family: 'Cascadia Code', 'Fira Code', 'SF Mono', monospace;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    min-width: 44px;
+    text-align: center;
+  }
+  .method.get    { background: #dbeafe; color: #1d4ed8; }
+  .method.post   { background: #d1fae5; color: #065f46; }
+  .method.put    { background: #fef3c7; color: #92400e; }
+  .method.delete { background: #fee2e2; color: #991b1b; }
+  :root[data-theme="dark"] .method.get    { background: #1e3a5f; color: #93c5fd; }
+  :root[data-theme="dark"] .method.post   { background: #064e3b; color: #6ee7b7; }
+  :root[data-theme="dark"] .method.put    { background: #451a03; color: #fcd34d; }
+  :root[data-theme="dark"] .method.delete { background: #450a0a; color: #fca5a5; }
+  @media (prefers-color-scheme: dark) {
+    .method.get    { background: #1e3a5f; color: #93c5fd; }
+    .method.post   { background: #064e3b; color: #6ee7b7; }
+    .method.put    { background: #451a03; color: #fcd34d; }
+    .method.delete { background: #450a0a; color: #fca5a5; }
+  }
+  .endpoint-path {
+    font-family: 'Cascadia Code', 'Fira Code', 'SF Mono', monospace;
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 600;
+  }
+  .endpoint-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-left: auto;
+  }
+  .endpoint-body {
+    padding: 12px 16px;
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .endpoint-auth {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 99px;
+    background: var(--violet-lt);
+    color: var(--violet);
+    font-weight: 600;
+  }
+
+  /* ── Code blocks ── */
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-size: 12.5px;
+    font-family: 'Cascadia Code', 'Fira Code', 'SF Mono', monospace;
+    color: var(--code-text);
+    line-height: 1.6;
+    margin: 12px 0;
+  }
+  code {
+    font-family: 'Cascadia Code', 'Fira Code', 'SF Mono', monospace;
+    font-size: .85em;
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  pre code { background: none; padding: 0; font-size: inherit; }
+
+  /* ── DB Schema ── */
+  .schema-wrap { overflow-x: auto; margin-top: 16px; }
+  .schema-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    font-variant-numeric: tabular-nums;
+  }
+  .schema-table th, .schema-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+  .schema-table thead th {
+    background: var(--surface2);
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--muted);
+  }
+  .schema-table td:first-child {
+    font-family: 'Cascadia Code', 'Fira Code', 'SF Mono', monospace;
+    font-size: 12px;
+    color: var(--text);
+  }
+  .type-badge {
+    font-size: 10.5px;
+    font-family: 'Cascadia Code', 'Fira Code', 'SF Mono', monospace;
+    background: var(--surface2);
+    color: var(--blue);
+    padding: 2px 7px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+  .pk-badge {
+    font-size: 10px;
+    font-weight: 700;
+    background: var(--violet-lt);
+    color: var(--violet);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .fk-badge {
+    font-size: 10px;
+    font-weight: 700;
+    background: #fef3c7;
+    color: #92400e;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  :root[data-theme="dark"] .fk-badge { background: #451a03; color: #fcd34d; }
+  @media (prefers-color-scheme: dark) { .fk-badge { background: #451a03; color: #fcd34d; } }
+
+  /* ── Steps (installation) ── */
+  .steps { margin-top: 20px; display: flex; flex-direction: column; gap: 0; }
+  .step {
+    display: flex;
+    gap: 16px;
+  }
+  .step-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .step-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--violet);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-line {
+    width: 1px;
+    flex: 1;
+    background: var(--border);
+    margin: 6px 0;
+    min-height: 20px;
+  }
+  .step:last-child .step-line { display: none; }
+  .step-body { padding-bottom: 24px; flex: 1; }
+  .step-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; margin-top: 3px; }
+  .step-body p { margin-bottom: 8px; }
+
+  /* ── Testing ── */
+  .test-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .test-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    background: var(--surface);
+  }
+  .test-type {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--violet);
+    margin-bottom: 4px;
+  }
+  .test-name { font-size: 13.5px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .test-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+  /* ── Alert boxes ── */
+  .alert {
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    font-size: 13px;
+    margin: 16px 0;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .alert-icon { flex-shrink: 0; margin-top: 1px; }
+  .alert.info  { background: var(--violet-lt); color: var(--violet-dk); border-left: 3px solid var(--violet); }
+  .alert.warn  { background: #fef9c3; color: #713f12; border-left: 3px solid var(--amber); }
+  :root[data-theme="dark"] .alert.warn { background: #1c1308; color: #fcd34d; }
+  @media (prefers-color-scheme: dark) { .alert.warn { background: #1c1308; color: #fcd34d; } }
+
+  /* ── TOC progress ── */
+  .toc-progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    background: var(--violet);
+    transition: width .1s;
+    z-index: 100;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .content { padding: 32px 24px 64px; }
+    .cover h1 { font-size: 28px; }
+    .roles { grid-template-columns: 1fr; }
+    .test-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="toc-progress" id="progress"></div>
+
+<nav class="sidebar" aria-label="Tabla de contenidos">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-name">OpenMed</div>
+        <div class="logo-sub">Logistics Platform</div>
+      </div>
+    </div>
+    <div class="version-chip">v1.0.0 — 2026</div>
+  </div>
+
+  <nav class="nav" aria-label="Secciones del manual">
+    <div class="nav-group">
+      <div class="nav-group-label">Introduccion</div>
+      <a href="#introduccion"><span class="nav-num">1</span> Descripcion general</a>
+      <a href="#arquitectura"><span class="nav-num">2</span> Arquitectura</a>
+      <a href="#tecnologias"><span class="nav-num">3</span> Tecnologias</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Sistema</div>
+      <a href="#modulos"><span class="nav-num">4</span> Modulos</a>
+      <a href="#roles"><span class="nav-num">5</span> Roles y permisos</a>
+      <a href="#api"><span class="nav-num">6</span> API Reference</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Datos</div>
+      <a href="#base-datos"><span class="nav-num">7</span> Base de datos</a>
+      <a href="#seguridad"><span class="nav-num">8</span> Seguridad</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Operaciones</div>
+      <a href="#instalacion"><span class="nav-num">9</span> Instalacion</a>
+      <a href="#testing"><span class="nav-num">10</span> Pruebas</a>
+    </div>
+  </nav>
+
+  <div class="theme-toggle">
+    <button class="theme-btn" onclick="toggleTheme()" aria-label="Cambiar tema">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/>
+        <line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+      Cambiar tema
+    </button>
+  </div>
+</nav>
+
+<main class="content">
+  <!-- COVER -->
+  <header class="cover">
+    <div class="cover-eyebrow">Manual del Sistema</div>
+    <h1>Plataforma de Gestion Logistica OpenMed</h1>
+    <p class="cover-desc">
+      Documentacion tecnica completa del sistema de seguimiento y gestion de envios,
+      desarrollado como proyecto academico para el curso de Calidad y Pruebas de Software — UPN.
+    </p>
+    <div class="cover-meta">
+      <div class="meta-item">
+        <div class="meta-label">Version</div>
+        <div class="meta-value">1.0.0</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Fecha</div>
+        <div class="meta-value">Julio 2026</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Curso</div>
+        <div class="meta-value">Calidad y Pruebas de Software</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Universidad</div>
+        <div class="meta-value">UPN — Universidad Privada del Norte</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Estado</div>
+        <div class="meta-value" style="color:var(--green);font-weight:700;">Activo</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 1. INTRODUCCION -->
+  <section class="section" id="introduccion">
+    <div class="section-eyebrow">Seccion 01</div>
+    <h2>Descripcion general</h2>
+    <p>
+      OpenMed Logistics es una plataforma web orientada a la gestion integral de envios y seguimiento logistico.
+      Permite a administradores supervisar operaciones en tiempo real, a clientes registrar y rastrear sus paquetes,
+      y a transportistas actualizar el estado de cada envio a lo largo de su recorrido.
+    </p>
+    <p>
+      El sistema implementa autenticacion basada en tokens JWT, control de acceso por roles, y expone
+      una API RESTful documentada que sirve de contrato entre el frontend React y el backend FastAPI.
+    </p>
+
+    <h3>Objetivos del sistema</h3>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-title">Rastreabilidad</div>
+        <p class="card-desc">Registro historico completo de cada envio desde su creacion hasta la entrega final.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Visibilidad operativa</div>
+        <p class="card-desc">Panel de administracion con KPIs, graficos de actividad y distribuciones de estado.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Control de acceso</div>
+        <p class="card-desc">Tres roles diferenciados con permisos granulares sobre cada recurso del sistema.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Calidad verificable</div>
+        <p class="card-desc">Suite de pruebas automatizadas que validan endpoints, logica de negocio y seguridad.</p>
+      </div>
+    </div>
+
+    <h3>Alcance funcional</h3>
+    <p>
+      El sistema cubre el ciclo de vida completo de un envio: registro del paquete, asignacion de ruta,
+      actualizaciones de estado en transito, y confirmacion de entrega o devolucion. El modulo de reportes
+      genera metricas agregadas para la toma de decisiones operativas.
+    </p>
+  </section>
+
+  <!-- 2. ARQUITECTURA -->
+  <section class="section" id="arquitectura">
+    <div class="section-eyebrow">Seccion 02</div>
+    <h2>Arquitectura del sistema</h2>
+    <p>
+      El sistema adopta una <strong>arquitectura de tres capas</strong> con separacion clara de responsabilidades.
+      La comunicacion entre capas se realiza exclusivamente a traves de HTTP/JSON mediante una API REST.
+    </p>
+
+    <div class="arch">
+      <div class="arch-layer">
+        <div class="arch-icon" style="background:#ede9fe;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6d28d9" stroke-width="2">
+            <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
+          </svg>
+        </div>
+        <div class="arch-info">
+          <div class="arch-name">Capa de Presentacion — Frontend</div>
+          <div class="arch-tech">React 19 + TypeScript 5.8 + Vite 6 + Tailwind CSS 4</div>
+        </div>
+        <code style="font-size:11px;color:var(--muted);background:none;padding:0;">puerto :5173</code>
+      </div>
+
+      <div class="arch-connector">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14M5 12l7 7 7-7"/>
+        </svg>
+        HTTP / JSON — Axios + TanStack Query
+      </div>
+
+      <div class="arch-layer">
+        <div class="arch-icon" style="background:#d1fae5;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#065f46" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </div>
+        <div class="arch-info">
+          <div class="arch-name">Capa de Logica de Negocio — Backend</div>
+          <div class="arch-tech">FastAPI 0.115 + SQLAlchemy 2.0 + Pydantic 2 + JWT (HS256)</div>
+        </div>
+        <code style="font-size:11px;color:var(--muted);background:none;padding:0;">puerto :8000</code>
+      </div>
+
+      <div class="arch-connector">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14M5 12l7 7 7-7"/>
+        </svg>
+        SQLAlchemy ORM — consultas parametrizadas
+      </div>
+
+      <div class="arch-layer">
+        <div class="arch-icon" style="background:#dbeafe;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2">
+            <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/>
+            <path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/>
+          </svg>
+        </div>
+        <div class="arch-info">
+          <div class="arch-name">Capa de Datos — Base de datos</div>
+          <div class="arch-tech">SQLite (desarrollo) / MySQL (produccion)</div>
+        </div>
+        <code style="font-size:11px;color:var(--muted);background:none;padding:0;">openmed.db</code>
+      </div>
+    </div>
+
+    <div class="alert info" style="margin-top:24px;">
+      <svg class="alert-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span>El frontend y el backend son completamente independientes.
+      El frontend puede desplegarse en cualquier CDN estatico (Vercel, Netlify) mientras el backend corre en un servidor Python separado.</span>
+    </div>
+  </section>
+
+  <!-- 3. TECNOLOGIAS -->
+  <section class="section" id="tecnologias">
+    <div class="section-eyebrow">Seccion 03</div>
+    <h2>Tecnologias utilizadas</h2>
+
+    <div class="tech-stack">
+      <div class="stack-layer">
+        <div class="stack-header">
+          <div class="stack-dot" style="background:#6d28d9;"></div>
+          <div class="stack-label">Frontend</div>
+          <div class="stack-arrow">React + TypeScript</div>
+        </div>
+        <div class="tech-pills">
+          <span class="pill"><span class="pill-dot" style="background:#61dafb;"></span>React 19</span>
+          <span class="pill"><span class="pill-dot" style="background:#3178c6;"></span>TypeScript 5.8</span>
+          <span class="pill"><span class="pill-dot" style="background:#646cff;"></span>Vite 6</span>
+          <span class="pill"><span class="pill-dot" style="background:#06b6d4;"></span>Tailwind CSS 4.1</span>
+          <span class="pill"><span class="pill-dot" style="background:#ef4444;"></span>TanStack Query 5</span>
+          <span class="pill"><span class="pill-dot" style="background:#f59e0b;"></span>React Hook Form 7</span>
+          <span class="pill"><span class="pill-dot" style="background:#10b981;"></span>Zod 3</span>
+          <span class="pill"><span class="pill-dot" style="background:#8b5cf6;"></span>Axios 1.8</span>
+          <span class="pill"><span class="pill-dot" style="background:#1a1a1a;"></span>Sonner</span>
+          <span class="pill"><span class="pill-dot" style="background:#f97316;"></span>pnpm</span>
+        </div>
+      </div>
+
+      <div class="stack-layer">
+        <div class="stack-header">
+          <div class="stack-dot" style="background:#009688;"></div>
+          <div class="stack-label">Backend</div>
+          <div class="stack-arrow">FastAPI + Python</div>
+        </div>
+        <div class="tech-pills">
+          <span class="pill"><span class="pill-dot" style="background:#009688;"></span>FastAPI 0.115</span>
+          <span class="pill"><span class="pill-dot" style="background:#cc0000;"></span>SQLAlchemy 2.0</span>
+          <span class="pill"><span class="pill-dot" style="background:#e92063;"></span>Pydantic 2</span>
+          <span class="pill"><span class="pill-dot" style="background:#f7931e;"></span>Python 3.11+</span>
+          <span class="pill"><span class="pill-dot" style="background:#0077b5;"></span>python-jose (JWT)</span>
+          <span class="pill"><span class="pill-dot" style="background:#4a4a4a;"></span>bcrypt</span>
+          <span class="pill"><span class="pill-dot" style="background:#0d9488;"></span>Uvicorn</span>
+        </div>
+      </div>
+
+      <div class="stack-layer">
+        <div class="stack-header">
+          <div class="stack-dot" style="background:#2563eb;"></div>
+          <div class="stack-label">Base de datos y pruebas</div>
+          <div class="stack-arrow">SQLite / Pytest</div>
+        </div>
+        <div class="tech-pills">
+          <span class="pill"><span class="pill-dot" style="background:#003b6f;"></span>SQLite 3</span>
+          <span class="pill"><span class="pill-dot" style="background:#00618a;"></span>MySQL 8</span>
+          <span class="pill"><span class="pill-dot" style="background:#0077c8;"></span>Pytest</span>
+          <span class="pill"><span class="pill-dot" style="background:#b71c1c;"></span>HTTPX (test client)</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. MODULOS -->
+  <section class="section" id="modulos">
+    <div class="section-eyebrow">Seccion 04</div>
+    <h2>Modulos del sistema</h2>
+    <p>La aplicacion se organiza en ocho modulos accesibles desde la barra lateral.
+    El acceso a cada modulo depende del rol del usuario autenticado.</p>
+
+    <div class="modules-grid">
+      <div class="module-card">
+        <div class="module-icon" style="background:#ede9fe;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6d28d9" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+          </svg>
+        </div>
+        <div class="module-name">Dashboard</div>
+        <div class="module-desc">KPIs, grafico de actividad diaria y resumen de ultimos envios y seguimientos.</div>
+      </div>
+      <div class="module-card">
+        <div class="module-icon" style="background:#dbeafe;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2">
+            <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+          </svg>
+        </div>
+        <div class="module-name">Envios</div>
+        <div class="module-desc">Registro, busqueda y listado de todos los paquetes con su estado actual.</div>
+      </div>
+      <div class="module-card">
+        <div class="module-icon" style="background:#d1fae5;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#065f46" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+          </svg>
+        </div>
+        <div class="module-name">Clientes</div>
+        <div class="module-desc">Directorio de usuarios registrados con sus roles y total de envios.</div>
+      </div>
+      <div class="module-card">
+        <div class="module-icon" style="background:#fef3c7;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#92400e" stroke-width="2">
+            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+            <rect x="9" y="3" width="6" height="4" rx="1"/>
+          </svg>
+        </div>
+        <div class="module-name">Seguimiento</div>
+        <div class="module-desc">Registro de cambios de estado con ubicacion, observaciones y hora exacta.</div>
+      </div>
+      <div class="module-card">
+        <div class="module-icon" style="background:#fee2e2;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2">
+            <path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+          </svg>
+        </div>
+        <div class="module-name">Rutas</div>
+        <div class="module-desc">Catalogo de rutas logisticas con distancias y tiempos estimados de transito.</div>
+      </div>
+      <div class="module-card">
+        <div class="module-icon" style="background:#e0e7ff;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3730a3" stroke-width="2">
+            <path d="M18 20V10M12 20V4M6 20v-6"/>
+          </svg>
+        </div>
+        <div class="module-name">Reportes</div>
+        <div class="module-desc">Graficos de distribucion por estado y peso, metricas de actividad del sistema.</div>
+      </div>
+      <div class="module-card">
+        <div class="module-icon" style="background:#fce7f3;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9d174d" stroke-width="2">
+            <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-5-5.917V5a1 1 0 10-2 0v.083A6 6 0 006 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+          </svg>
+        </div>
+        <div class="module-name">Notificaciones</div>
+        <div class="module-desc">Centro de alertas sobre cambios de estado y eventos relevantes del sistema.</div>
+      </div>
+      <div class="module-card">
+        <div class="module-icon" style="background:#f0fdf4;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.07 4.93l-1.41 1.41M6.34 17.66l-1.41 1.41M20 12h-2M6 12H4M17.66 17.66l-1.41-1.41M6.34 6.34L4.93 4.93"/>
+          </svg>
+        </div>
+        <div class="module-name">Configuracion</div>
+        <div class="module-desc">Gestion del perfil de usuario, preferencias y ajustes de cuenta.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. ROLES -->
+  <section class="section" id="roles">
+    <div class="section-eyebrow">Seccion 05</div>
+    <h2>Roles y permisos</h2>
+    <p>El sistema implementa control de acceso basado en roles (RBAC).
+    El rol se almacena en el payload del token JWT y se verifica en cada endpoint protegido del backend.</p>
+
+    <div class="roles">
+      <div class="role-card">
+        <div class="role-badge" style="background:#ede9fe;color:#5b21b6;">
+          <span>&#9673;</span> Administrador
+        </div>
+        <ul class="role-perms">
+          <li>Ver dashboard con KPIs</li>
+          <li>Listar todos los envios</li>
+          <li>Gestionar clientes</li>
+          <li>Registrar seguimientos</li>
+          <li>Acceder a reportes</li>
+          <li>Ver rutas logisticas</li>
+        </ul>
+      </div>
+      <div class="role-card">
+        <div class="role-badge" style="background:#dbeafe;color:#1d4ed8;">
+          <span>&#9673;</span> Cliente
+        </div>
+        <ul class="role-perms">
+          <li>Ver sus propios envios</li>
+          <li>Consultar seguimiento</li>
+          <li>Recibir notificaciones</li>
+          <li>Gestionar su perfil</li>
+          <li>Sin acceso a reportes</li>
+          <li>Sin acceso a rutas</li>
+        </ul>
+      </div>
+      <div class="role-card">
+        <div class="role-badge" style="background:#d1fae5;color:#065f46;">
+          <span>&#9673;</span> Transportista
+        </div>
+        <ul class="role-perms">
+          <li>Ver envios asignados</li>
+          <li>Actualizar estados</li>
+          <li>Registrar ubicacion</li>
+          <li>Gestionar su perfil</li>
+          <li>Sin acceso a clientes</li>
+          <li>Sin acceso a reportes</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Matriz de permisos</h3>
+    <div class="matrix-wrap">
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th>Recurso / Accion</th>
+            <th>Admin</th>
+            <th>Cliente</th>
+            <th>Transportista</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Dashboard (stats globales)</td><td><span class="check">&#10003;</span></td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td></tr>
+          <tr><td>Listar todos los envios</td><td><span class="check">&#10003;</span></td><td><span class="partial">&#9672;</span></td><td><span class="partial">&#9672;</span></td></tr>
+          <tr><td>Crear envio</td><td><span class="check">&#10003;</span></td><td><span class="check">&#10003;</span></td><td><span class="cross">&#10007;</span></td></tr>
+          <tr><td>Registrar seguimiento</td><td><span class="check">&#10003;</span></td><td><span class="cross">&#10007;</span></td><td><span class="check">&#10003;</span></td></tr>
+          <tr><td>Ver historial seguimiento</td><td><span class="check">&#10003;</span></td><td><span class="partial">&#9672;</span></td><td><span class="partial">&#9672;</span></td></tr>
+          <tr><td>Gestion de clientes</td><td><span class="check">&#10003;</span></td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td></tr>
+          <tr><td>Reportes y estadisticas</td><td><span class="check">&#10003;</span></td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td></tr>
+          <tr><td>Ver rutas logisticas</td><td><span class="check">&#10003;</span></td><td><span class="cross">&#10007;</span></td><td><span class="check">&#10003;</span></td></tr>
+          <tr><td>Configuracion de perfil</td><td><span class="check">&#10003;</span></td><td><span class="check">&#10003;</span></td><td><span class="check">&#10003;</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-top:8px;">
+      <span class="check">&#10003;</span> Acceso completo &nbsp;
+      <span class="partial">&#9672;</span> Solo propios registros &nbsp;
+      <span class="cross">&#10007;</span> Sin acceso
+    </p>
+  </section>
+
+  <!-- 6. API REFERENCE -->
+  <section class="section" id="api">
+    <div class="section-eyebrow">Seccion 06</div>
+    <h2>Referencia de la API</h2>
+    <p>Todos los endpoints estan disponibles en <code>http://localhost:8000</code>.
+    La documentacion interactiva automatica de FastAPI se accede en <code>/docs</code> (Swagger) y <code>/redoc</code>.</p>
+
+    <div class="alert info">
+      <svg class="alert-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      Los endpoints marcados con <span class="endpoint-auth">&#128274; JWT</span> requieren el header
+      <code>Authorization: Bearer &lt;token&gt;</code>.
+    </div>
+
+    <h3>Autenticacion</h3>
+
+    <div class="endpoint">
+      <div class="endpoint-header">
+        <span class="method post">POST</span>
+        <span class="endpoint-path">/auth/register</span>
+        <span class="endpoint-desc">Registro de nuevo usuario</span>
+      </div>
+      <div class="endpoint-body">
+        <p>Crea un usuario con hash bcrypt de la contrasena. El rol por defecto es <code>cliente</code>.</p>
+        <pre>{
+  "correo": "usuario@ejemplo.com",
+  "contrasena": "secret123",
+  "nombre_completo": "Juan Perez",
+  "telefono": "999888777"
+}</pre>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header">
+        <span class="method post">POST</span>
+        <span class="endpoint-path">/auth/login</span>
+        <span class="endpoint-desc">Autenticacion — devuelve token JWT</span>
+      </div>
+      <div class="endpoint-body">
+        <p>Recibe credenciales y retorna un access_token JWT con duracion de 24 horas. El payload incluye <code>sub</code> (correo) y <code>rol</code>.</p>
+        <pre>{
+  "correo": "usuario@ejemplo.com",
+  "contrasena": "secret123"
+}</pre>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header">
+        <span class="method get">GET</span>
+        <span class="endpoint-path">/auth/me</span>
+        <span class="endpoint-desc">Perfil del usuario autenticado</span>
+        <span class="endpoint-auth">&#128274; JWT</span>
+      </div>
+      <div class="endpoint-body">
+        Retorna los datos del usuario actual extraidos del token JWT validado.
+      </div>
+    </div>
+
+    <h3>Envios</h3>
+
+    <div class="endpoint">
+      <div class="endpoint-header">
+        <span class="method post">POST</span>
+        <span class="endpoint-path">/envios/</span>
+        <span class="endpoint-desc">Crear nuevo envio</span>
+        <span class="endpoint-auth">&#128274; JWT</span>
+      </div>
+      <div class="endpoint-body">
+        <p>Registra un nuevo envio. El codigo de tracking debe ser unico en el sistema.</p>
+        <pre>{
+  "codigo_tracking": "TRK-2025-001",
+  "descripcion_paquete": "Documentos medicos",
+  "peso_kg": 1.5,
+  "direccion_origen": "Av. Lima 123, Lima",
+  "direccion_destino": "Av. Arequipa 456, Arequipa",
+  "id_usuario_cliente": 3
+}</pre>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header">
+        <span class="method get">GET</span>
+        <span class="endpoint-path">/envios/{codigo_tracking}</span>
+        <span class="endpoint-desc">Detalle de un envio</span>
+        <span class="endpoint-auth">&#128274; JWT</span>
+      </div>
+      <div class="endpoint-body">
+        Retorna el envio identificado por su codigo junto con el ultimo estado de seguimiento registrado.
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header">
+        <span class="method post">POST</span>
+        <span class="endpoint-path">/envios/{codigo_tracking}/seguimiento</span>
+        <span class="endpoint-desc">Agregar actualizacion de estado</span>
+        <span class="endpoint-auth">&#128274; JWT</span>
+      </div>
+      <div class="endpoint-body">
+        <pre>{
+  "estado": "en_transito",
+  "ubicacion_actual": "Lima, San Isidro",
+  "observaciones": "Paquete recogido por transportista"
+}</pre>
+        <p style="margin-top:8px;">Estados validos: <code>registrado</code> <code>en_transito</code> <code>en_deposito</code> <code>entregado</code> <code>devuelto</code></p>
+      </div>
+    </div>
+
+    <h3>Admin</h3>
+
+    <div class="endpoint">
+      <div class="endpoint-header">
+        <span class="method get">GET</span>
+        <span class="endpoint-path">/admin/stats</span>
+        <span class="endpoint-desc">Estadisticas globales del sistema</span>
+        <span class="endpoint-auth">&#128274; admin</span>
+      </div>
+      <div class="endpoint-body">
+        Retorna KPIs: envios del dia, del mes, total, clientes activos, en transito, distribucion por estado y actividad de los ultimos 14 dias.
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header">
+        <span class="method get">GET</span>
+        <span class="endpoint-path">/admin/envios?skip=0&limit=100</span>
+        <span class="endpoint-desc">Listado paginado de todos los envios</span>
+        <span class="endpoint-auth">&#128274; admin</span>
+      </div>
+      <div class="endpoint-body">Incluye el ultimo estado de seguimiento de cada envio calculado via subconsulta.</div>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header">
+        <span class="method get">GET</span>
+        <span class="endpoint-path">/admin/clientes</span>
+        <span class="endpoint-desc">Directorio de usuarios y total de envios</span>
+        <span class="endpoint-auth">&#128274; admin</span>
+      </div>
+      <div class="endpoint-body">Lista todos los usuarios con su conteo de envios asociados.</div>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header">
+        <span class="method get">GET</span>
+        <span class="endpoint-path">/admin/seguimientos</span>
+        <span class="endpoint-desc">Historial completo de seguimientos</span>
+        <span class="endpoint-auth">&#128274; admin</span>
+      </div>
+      <div class="endpoint-body">Retorna todos los registros de seguimiento ordenados por fecha descendente, con el codigo de tracking de su envio.</div>
+    </div>
+  </section>
+
+  <!-- 7. BASE DE DATOS -->
+  <section class="section" id="base-datos">
+    <div class="section-eyebrow">Seccion 07</div>
+    <h2>Esquema de base de datos</h2>
+    <p>El modelo relacional consta de tres tablas principales. SQLAlchemy gestiona la creacion automatica del esquema mediante <code>Base.metadata.create_all()</code>.</p>
+
+    <h3>Tabla: <code>usuarios</code></h3>
+    <div class="schema-wrap">
+      <table class="schema-table">
+        <thead>
+          <tr><th>Columna</th><th>Tipo</th><th>Restriccion</th><th>Descripcion</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>id_usuario</td><td><span class="type-badge">INTEGER</span></td><td><span class="pk-badge">PK · AUTO</span></td><td>Identificador unico</td></tr>
+          <tr><td>correo</td><td><span class="type-badge">VARCHAR</span></td><td>UNIQUE · NOT NULL</td><td>Email de acceso al sistema</td></tr>
+          <tr><td>hashed_password</td><td><span class="type-badge">VARCHAR</span></td><td>NOT NULL</td><td>Hash bcrypt de la contrasena</td></tr>
+          <tr><td>nombre_completo</td><td><span class="type-badge">VARCHAR</span></td><td>NOT NULL</td><td>Nombre completo del usuario</td></tr>
+          <tr><td>telefono</td><td><span class="type-badge">VARCHAR</span></td><td>NULLABLE</td><td>Numero de contacto opcional</td></tr>
+          <tr><td>rol</td><td><span class="type-badge">VARCHAR</span></td><td>DEFAULT 'cliente'</td><td>admin | cliente | transportista</td></tr>
+          <tr><td>fecha_registro</td><td><span class="type-badge">DATETIME</span></td><td>DEFAULT NOW()</td><td>Fecha de creacion del registro</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Tabla: <code>envios</code></h3>
+    <div class="schema-wrap">
+      <table class="schema-table">
+        <thead>
+          <tr><th>Columna</th><th>Tipo</th><th>Restriccion</th><th>Descripcion</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>id_envio</td><td><span class="type-badge">INTEGER</span></td><td><span class="pk-badge">PK · AUTO</span></td><td>Identificador unico</td></tr>
+          <tr><td>codigo_tracking</td><td><span class="type-badge">VARCHAR</span></td><td>UNIQUE · NOT NULL</td><td>Codigo publico de rastreo</td></tr>
+          <tr><td>id_usuario_cliente</td><td><span class="type-badge">INTEGER</span></td><td><span class="fk-badge">FK → usuarios</span></td><td>Cliente propietario del envio</td></tr>
+          <tr><td>descripcion_paquete</td><td><span class="type-badge">TEXT</span></td><td>NULLABLE</td><td>Contenido o descripcion</td></tr>
+          <tr><td>peso_kg</td><td><span class="type-badge">FLOAT</span></td><td>NULLABLE</td><td>Peso del paquete en kg</td></tr>
+          <tr><td>dimensiones</td><td><span class="type-badge">VARCHAR</span></td><td>NULLABLE</td><td>Dimensiones (ej: 30x20x10 cm)</td></tr>
+          <tr><td>direccion_origen</td><td><span class="type-badge">VARCHAR</span></td><td>NOT NULL</td><td>Direccion de recogida</td></tr>
+          <tr><td>direccion_destino</td><td><span class="type-badge">VARCHAR</span></td><td>NOT NULL</td><td>Direccion de entrega</td></tr>
+          <tr><td>fecha_creacion</td><td><span class="type-badge">DATETIME</span></td><td>DEFAULT NOW()</td><td>Fecha de registro del envio</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Tabla: <code>seguimientos</code></h3>
+    <div class="schema-wrap">
+      <table class="schema-table">
+        <thead>
+          <tr><th>Columna</th><th>Tipo</th><th>Restriccion</th><th>Descripcion</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>id_seguimiento</td><td><span class="type-badge">INTEGER</span></td><td><span class="pk-badge">PK · AUTO</span></td><td>Identificador unico</td></tr>
+          <tr><td>id_envio</td><td><span class="type-badge">INTEGER</span></td><td><span class="fk-badge">FK → envios</span></td><td>Envio al que pertenece</td></tr>
+          <tr><td>estado</td><td><span class="type-badge">VARCHAR</span></td><td>NOT NULL</td><td>Estado logistico del envio</td></tr>
+          <tr><td>ubicacion_actual</td><td><span class="type-badge">VARCHAR</span></td><td>NULLABLE</td><td>Ciudad o punto de control</td></tr>
+          <tr><td>observaciones</td><td><span class="type-badge">TEXT</span></td><td>NULLABLE</td><td>Nota del transportista</td></tr>
+          <tr><td>fecha_hora_actualizacion</td><td><span class="type-badge">DATETIME</span></td><td>DEFAULT NOW()</td><td>Timestamp de la actualizacion</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 8. SEGURIDAD -->
+  <section class="section" id="seguridad">
+    <div class="section-eyebrow">Seccion 08</div>
+    <h2>Seguridad</h2>
+
+    <h3>Autenticacion JWT</h3>
+    <p>El sistema utiliza JSON Web Tokens firmados con el algoritmo HS256. Los tokens incluyen:</p>
+    <pre>{
+  "sub": "usuario@ejemplo.com",   // correo del usuario
+  "rol": "admin",                 // rol para RBAC
+  "exp": 1751827200               // expiracion en 24 horas
+}</pre>
+
+    <h3>Proteccion de contrasenas</h3>
+    <p>Las contrasenas nunca se almacenan en texto plano. Se aplica bcrypt con factor de coste predeterminado
+    (12 rondas). La verificacion usa <code>verify_password(plain, hashed)</code> de la libreria passlib.</p>
+
+    <h3>Autorizacion por rol</h3>
+    <p>Cada endpoint protegido invoca la dependencia <code>get_current_user</code> que decodifica el token
+    y retorna un diccionario con el correo y el rol. Los endpoints de admin verifican:</p>
+    <pre>if current_user.get("rol") != "admin":
+    raise HTTPException(status_code=403, detail="Acceso denegado")</pre>
+
+    <h3>Validacion de datos</h3>
+    <p>Pydantic 2 valida todos los cuerpos de request en el backend antes de procesarlos.
+    En el frontend, Zod valida los formularios antes de enviar cualquier peticion HTTP,
+    eliminando una categoria completa de errores de entrada.</p>
+
+    <div class="alert warn">
+      <svg class="alert-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      <span>El <code>SECRET_KEY</code> para firmar los tokens JWT debe configurarse como variable de entorno en produccion.
+      No hardcodear en el codigo fuente.</span>
+    </div>
+  </section>
+
+  <!-- 9. INSTALACION -->
+  <section class="section" id="instalacion">
+    <div class="section-eyebrow">Seccion 09</div>
+    <h2>Guia de instalacion</h2>
+
+    <h3>Requisitos previos</h3>
+    <div class="card-grid" style="margin-bottom:24px;">
+      <div class="card">
+        <div class="card-title">Python 3.11+</div>
+        <p class="card-desc">Entorno de ejecucion del backend FastAPI.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Node.js 20+ / pnpm</div>
+        <p class="card-desc">Entorno de ejecucion y gestor de paquetes del frontend.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Git</div>
+        <p class="card-desc">Para clonar el repositorio del proyecto.</p>
+      </div>
+    </div>
+
+    <h3>Backend (FastAPI)</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-left"><div class="step-num">1</div><div class="step-line"></div></div>
+        <div class="step-body">
+          <div class="step-title">Clonar el repositorio y entrar al directorio del backend</div>
+          <pre>git clone &lt;url-repositorio&gt;
+cd back</pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-left"><div class="step-num">2</div><div class="step-line"></div></div>
+        <div class="step-body">
+          <div class="step-title">Crear y activar entorno virtual</div>
+          <pre>python -m venv venv
+# Windows
+venv\Scripts\activate
+# Linux / macOS
+source venv/bin/activate</pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-left"><div class="step-num">3</div><div class="step-line"></div></div>
+        <div class="step-body">
+          <div class="step-title">Instalar dependencias</div>
+          <pre>pip install -r requirements.txt</pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-left"><div class="step-num">4</div><div class="step-line"></div></div>
+        <div class="step-body">
+          <div class="step-title">Ejecutar el servidor de desarrollo</div>
+          <pre>uvicorn main:app --reload --port 8000</pre>
+          <p>El servidor queda disponible en <code>http://localhost:8000</code>. La base de datos SQLite se crea automaticamente.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>Frontend (React)</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-left"><div class="step-num">1</div><div class="step-line"></div></div>
+        <div class="step-body">
+          <div class="step-title">Entrar al directorio del frontend</div>
+          <pre>cd front</pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-left"><div class="step-num">2</div><div class="step-line"></div></div>
+        <div class="step-body">
+          <div class="step-title">Instalar dependencias con pnpm</div>
+          <pre>pnpm install</pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-left"><div class="step-num">3</div><div class="step-line"></div></div>
+        <div class="step-body">
+          <div class="step-title">Iniciar el servidor de desarrollo</div>
+          <pre>pnpm dev</pre>
+          <p>La aplicacion queda disponible en <code>http://localhost:5173</code>.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>Generar build de produccion</h3>
+    <pre>pnpm build     # genera dist/
+pnpm preview   # sirve el build localmente</pre>
+  </section>
+
+  <!-- 10. TESTING -->
+  <section class="section" id="testing">
+    <div class="section-eyebrow">Seccion 10</div>
+    <h2>Estrategia de pruebas</h2>
+    <p>El proyecto implementa pruebas automatizadas con Pytest en el backend,
+    cubriendo validaciones de entrada, logica de negocio, autenticacion y casos de error.</p>
+
+    <div class="test-grid">
+      <div class="test-card">
+        <div class="test-type">Pruebas unitarias</div>
+        <div class="test-name">Validacion de schemas</div>
+        <div class="test-desc">Verifican que los modelos Pydantic rechacen datos invalidos (correo mal formado, peso negativo, campos requeridos vacios).</div>
+      </div>
+      <div class="test-card">
+        <div class="test-type">Pruebas de integracion</div>
+        <div class="test-name">Flujo de autenticacion</div>
+        <div class="test-desc">Prueban el ciclo completo: registro → login → token → acceso a recurso protegido con HTTPX sobre DB SQLite en memoria.</div>
+      </div>
+      <div class="test-card">
+        <div class="test-type">Pruebas de negocio</div>
+        <div class="test-name">Gestion de envios</div>
+        <div class="test-desc">Crean, consultan y actualizan envios verificando que el estado se propague correctamente a traves de los seguimientos.</div>
+      </div>
+      <div class="test-card">
+        <div class="test-type">Pruebas de seguridad</div>
+        <div class="test-name">Control de acceso</div>
+        <div class="test-desc">Verifican que los endpoints de admin devuelvan 403 para roles sin privilegios y 401 para tokens invalidos o ausentes.</div>
+      </div>
+      <div class="test-card">
+        <div class="test-type">Pruebas de salud</div>
+        <div class="test-name">Health checks</div>
+        <div class="test-desc">Verifican que el endpoint raiz responda con 200 y confirman que la API este operativa antes de ejecutar suites completas.</div>
+      </div>
+      <div class="test-card">
+        <div class="test-type">Pruebas de duplicados</div>
+        <div class="test-name">Restricciones de unicidad</div>
+        <div class="test-desc">Verifican que el sistema retorne el error correcto al registrar un correo o codigo de tracking ya existente en la base de datos.</div>
+      </div>
+    </div>
+
+    <h3>Ejecutar la suite de pruebas</h3>
+    <pre># Desde el directorio back/
+pytest tests/ -v
+
+# Con reporte de cobertura
+pytest tests/ --cov=app --cov-report=term-missing</pre>
+
+    <h3>Estructura de pruebas</h3>
+    <pre>back/
+  tests/
+    test_auth.py          # Registro, login, tokens
+    test_envios.py        # CRUD de envios y seguimientos
+    test_admin.py         # Endpoints de administrador
+    test_validations.py   # Schemas y validaciones Pydantic
+    conftest.py           # Fixtures: DB en memoria, usuario de prueba</pre>
+
+    <div class="alert info">
+      <svg class="alert-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      Las pruebas usan una base de datos SQLite en memoria separada de la base de produccion.
+      Cada test comienza con un estado limpio gracias al fixture <code>db_session</code> con rollback automatico.
+    </div>
+  </section>
+</main>
+
+<script>
+  // Progress bar
+  window.addEventListener('scroll', () => {
+    const el = document.getElementById('progress')
+    if (!el) return
+    const max = document.documentElement.scrollHeight - window.innerHeight
+    el.style.width = (window.scrollY / max * 100) + '%'
+  })
+
+  // Active nav link
+  const sections = document.querySelectorAll('.section')
+  const links = document.querySelectorAll('.nav a')
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'))
+        const active = document.querySelector('.nav a[href="#' + e.target.id + '"]')
+        if (active) active.classList.add('active')
+      }
+    })
+  }, { rootMargin: '-20% 0px -70% 0px' })
+  sections.forEach(s => observer.observe(s))
+
+  // Theme toggle
+  function toggleTheme() {
+    const root = document.documentElement
+    const curr = root.dataset.theme
+    const isDark = curr === 'dark' || (!curr && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    root.dataset.theme = isDark ? 'light' : 'dark'
+  }
+</script>
